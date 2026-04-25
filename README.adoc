@@ -1,0 +1,128 @@
+= crystal-emojis-lite
+:toc: macro
+:toclevels: 2
+
+~200 commonly-used emojis as embedded SVG, sourced from
+https://github.com/jdecked/twemoji[Twemoji] (MIT). Pure Crystal,
+no runtime dependency.
+
+🇫🇷 Lisez ce document en français : link:README.fr.adoc[README.fr.adoc]
+
+For the full ~3700-emoji set, use the sibling shard
+`crystal-emojis-full` instead — same API, larger binary footprint
+(~7-12 MB embedded vs ~840 KB here).
+
+toc::[]
+
+== Why
+
+Crystal libraries that render text to PDF, SVG or HTML routinely
+hit the « silent tofu » failure mode when an emoji appears in the
+input : the underlying font has no glyph for it, the renderer
+emits an empty rectangle, no warning is given.
+
+The proper fix is to render emojis as embedded SVG glyphs (the
+same technique that
+https://github.com/aloli-crystal/crystal-flags[crystal-flags] uses
+for country flags). This shard is the asset library for the most
+common ~200 emojis ; the consumer (e.g. crystal-asciidoctor-pdf)
+detects emoji codepoints and calls `page.svg(...)` with the SVG
+returned by `CrystalEmojis.svg(char)`.
+
+== What's in the lite set
+
+~200 emojis covering the categories most likely to appear in
+technical documents :
+
+* Status & validation : ✅ ❌ ⚠ ✔ ✖ ❗ ❓ ⭕ 🆗 🆖 ➕ ➖
+* Colour circles & squares : 🔴 🟢 🟡 🔵 🟣 ⚫ ⚪ 🟤 + carrés
+* Faces classics + emotions
+* Hands & gestures : 👍 👎 👌 🤝 🙏
+* Dev tools : 💻 ⌨ ⚙ 🔧 🛠 📋 📌 📎 📊 📈 📉
+* Security : 🔑 🔒 🔓 🔐 🛡
+* Communication : 📧 📞 💬 📢
+* Music : 🎵 🎶 🎼 🎹 🎸 🎻 🥁
+* Documents, writing, money, time, arrows, symbols…
+
+Full list in `data/svg/MANIFEST.txt`.
+
+== Installation
+
+[source,yaml]
+----
+dependencies:
+  crystal-emojis-lite:
+    github: aloli-crystal/crystal-emojis-lite
+    version: "~> 0.1"
+----
+
+== Usage
+
+[source,crystal]
+----
+require "crystal-emojis-lite"
+
+# Lookup by Char (most natural).
+svg_string = CrystalEmojis.svg('✅')
+# => "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 36 36\">…</svg>"
+
+# Or by codepoint.
+CrystalEmojis.svg(0x2705) == CrystalEmojis.svg('✅')  # => true
+
+# Detection (cheaper than .svg when you only want a yes/no).
+CrystalEmojis.includes?('✅')  # => true
+CrystalEmojis.includes?('a')   # => false
+
+# Multi-codepoint sequences (skin tones, ZWJ joins) — none in lite,
+# but the API accepts them for forward compatibility with the full set.
+CrystalEmojis.svg([0x1F468, 0x200D, 0x1F4BB])  # => nil in lite
+
+# Iteration / discovery.
+CrystalEmojis.size              # => 208
+CrystalEmojis.keys              # => ["1f196", "1f197", "1f308", …]
+CrystalEmojis.each do |key, svg|
+  # …
+end
+----
+
+== Limitations
+
+* Single-codepoint emojis only. ZWJ joins, skin tone variants and
+  flag sequences are absent (those of you reading « lite » are
+  expected to need them rarely — see `crystal-flags` for country
+  flags and `crystal-emojis-full` for everything else).
+* A few simple dingbats (← → ↑ ↓ ☐ ✓ ✗) have no Twemoji glyph and
+  are intentionally absent. Fall back to text or to a font like
+  DejaVu Sans for those.
+
+== Font credits
+
+Twemoji © Twitter, Inc and other contributors. **CC-BY 4.0** —
+see the full text in `data/svg/LICENSE-twemoji.txt`.
+
+**Required attribution** : if you redistribute the graphics or
+build a downstream work that includes them, you must credit
+Twemoji. Recommended attribution :
+
+[source]
+----
+Graphics: Twemoji, © Twitter, Inc, CC-BY 4.0
+https://github.com/jdecked/twemoji
+----
+
+== Development
+
+[source,shell]
+----
+shards install
+crystal spec
+bin/ameba
+crystal tool format src/ spec/
+----
+
+== Licence summary
+
+* **Crystal code** : MIT, see link:LICENSE[LICENSE]
+* **Embedded SVG graphics** : Twemoji CC-BY 4.0, see
+  `data/svg/LICENSE-twemoji.txt`. Attribution to Twitter/Twemoji
+  required when redistributing.

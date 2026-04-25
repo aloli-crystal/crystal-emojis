@@ -1,0 +1,261 @@
+# crystal-emojis-lite — curated list of ~200 commonly-used emoji
+# codepoints, in lowercase hex (Twemoji file naming convention).
+# Multi-codepoint sequences are joined with `-`.
+#
+# Lines starting with `#` are comments. Blank lines are ignored.
+# The build-time embedding macro reads this manifest and embeds
+# `data/svg/<codepoint>.svg` for every entry.
+#
+# Source : Twemoji (https://github.com/jdecked/twemoji), MIT.
+#
+# A few simple dingbats (← → ☐ ✓ ✗ etc.) are NOT in Twemoji's
+# coverage — they have no « emoji presentation ». Use crystal-flags
+# / DejaVu Sans for them when needed.
+
+# === Status & validation ===
+2705   # ✅ white heavy check mark
+274c   # ❌ cross mark
+26a0   # ⚠ warning sign
+2714   # ✔ heavy check mark
+2716   # ✖ heavy multiplication x
+2611   # ☑ ballot box with check
+2757   # ❗ heavy exclamation mark
+2753   # ❓ black question mark ornament
+2755   # ❕ white exclamation mark
+2754   # ❔ white question mark
+2b55   # ⭕ heavy large circle
+1f197  # 🆗 squared OK
+1f196  # 🆖 squared NG
+2795   # ➕ heavy plus sign
+2796   # ➖ heavy minus sign
+
+# === Colour circles ===
+1f534  # 🔴 red circle
+1f7e0  # 🟠 orange circle
+1f7e1  # 🟡 yellow circle
+1f7e2  # 🟢 green circle
+1f535  # 🔵 blue circle
+1f7e3  # 🟣 purple circle
+26ab   # ⚫ medium black circle
+26aa   # ⚪ medium white circle
+1f7e4  # 🟤 brown circle
+
+# === Colour squares ===
+1f7e5  # 🟥 red square
+1f7e7  # 🟧 orange square
+1f7e8  # 🟨 yellow square
+1f7e9  # 🟩 green square
+1f7e6  # 🟦 blue square
+1f7ea  # 🟪 purple square
+2b1b   # ⬛ black large square
+2b1c   # ⬜ white large square
+1f7eb  # 🟫 brown square
+
+# === Geometric shapes ===
+1f536  # 🔶 large orange diamond
+1f537  # 🔷 large blue diamond
+1f538  # 🔸 small orange diamond
+1f539  # 🔹 small blue diamond
+1f53a  # 🔺 up-pointing red triangle
+1f53b  # 🔻 down-pointing red triangle
+
+# === Faces (classic) ===
+1f600  # 😀 grinning face
+1f603  # 😃 grinning face with big eyes
+1f604  # 😄 grinning face with smiling eyes
+1f601  # 😁 beaming face with smiling eyes
+1f605  # 😅 grinning face with sweat
+1f602  # 😂 face with tears of joy
+1f923  # 🤣 rolling on the floor laughing
+1f60a  # 😊 smiling face with smiling eyes
+1f642  # 🙂 slightly smiling face
+1f643  # 🙃 upside-down face
+1f609  # 😉 winking face
+1f607  # 😇 smiling face with halo
+1f60d  # 😍 smiling face with heart-eyes
+1f618  # 😘 face blowing a kiss
+1f60e  # 😎 smiling face with sunglasses
+1f913  # 🤓 nerd face
+1f914  # 🤔 thinking face
+1f928  # 🤨 face with raised eyebrow
+1f610  # 😐 neutral face
+1f611  # 😑 expressionless face
+1f636  # 😶 face without mouth
+1f644  # 🙄 face with rolling eyes
+1f60f  # 😏 smirking face
+1f62c  # 😬 grimacing face
+1f634  # 😴 sleeping face
+1f62a  # 😪 sleepy face
+1f637  # 😷 face with medical mask
+1f912  # 🤒 face with thermometer
+1f915  # 🤕 face with head bandage
+1f927  # 🤧 sneezing face
+
+# === Faces (emotion) ===
+1f622  # 😢 crying face
+1f62d  # 😭 loudly crying face
+1f631  # 😱 face screaming in fear
+1f628  # 😨 fearful face
+1f621  # 😡 pouting face
+1f92c  # 🤬 face with symbols on mouth
+1f92f  # 🤯 exploding head
+1f973  # 🥳 partying face
+1f97a  # 🥺 pleading face
+1f614  # 😔 pensive face
+1f615  # 😕 confused face
+1f61f  # 😟 worried face
+1f629  # 😩 weary face
+1f62b  # 😫 tired face
+1f975  # 🥵 hot face
+
+# === Hands & gestures ===
+1f44d  # 👍 thumbs up
+1f44e  # 👎 thumbs down
+1f44c  # 👌 OK hand
+1f91e  # 🤞 crossed fingers
+1f91d  # 🤝 handshake
+1f64f  # 🙏 folded hands
+270b   # ✋ raised hand
+261d   # ☝ index pointing up
+1f446  # 👆 backhand index pointing up
+1f447  # 👇 backhand index pointing down
+1f449  # 👉 backhand index pointing right
+1f448  # 👈 backhand index pointing left
+
+# === Dev tools ===
+1f4bb  # 💻 laptop
+2328   # ⌨ keyboard
+1f5b1  # 🖱 computer mouse
+1f4be  # 💾 floppy disk
+1f4c1  # 📁 file folder
+1f4c2  # 📂 open file folder
+1f4ca  # 📊 bar chart
+1f4c8  # 📈 chart increasing
+1f4c9  # 📉 chart decreasing
+1f4cb  # 📋 clipboard
+1f4cc  # 📌 pushpin
+1f4ce  # 📎 paperclip
+2699   # ⚙ gear
+1f527  # 🔧 wrench
+1f528  # 🔨 hammer
+1f6e0  # 🛠 hammer and wrench
+
+# === Security ===
+1f511  # 🔑 key
+1f512  # 🔒 locked
+1f513  # 🔓 unlocked
+1f510  # 🔐 locked with key
+1f5dd  # 🗝 old key
+1f6e1  # 🛡 shield
+2694   # ⚔ crossed swords
+1f6a8  # 🚨 police light
+
+# === Communication ===
+1f4e7  # 📧 e-mail
+1f4e8  # 📨 incoming envelope
+1f4e5  # 📥 inbox tray
+1f4e4  # 📤 outbox tray
+1f4de  # 📞 telephone receiver
+1f4ac  # 💬 speech balloon
+1f4ad  # 💭 thought balloon
+1f4e2  # 📢 loudspeaker
+1f4e3  # 📣 megaphone
+260e   # ☎ telephone
+
+# === Places ===
+1f3e0  # 🏠 house
+1f3e2  # 🏢 office building
+1f3e5  # 🏥 hospital
+1f3e6  # 🏦 bank
+1f3e8  # 🏨 hotel
+26ea   # ⛪ church
+1f3db  # 🏛 classical building
+1f30d  # 🌍 globe showing Europe-Africa
+
+# === Nature ===
+1f31e  # 🌞 sun with face
+1f319  # 🌙 crescent moon
+2b50   # ⭐ star
+2728   # ✨ sparkles
+26a1   # ⚡ high voltage
+1f525  # 🔥 fire
+1f4a7  # 💧 droplet
+1f30a  # 🌊 water wave
+2614   # ☔ umbrella with rain drops
+1f308  # 🌈 rainbow
+
+# === Media ===
+1f4fa  # 📺 television
+1f4fb  # 📻 radio
+1f4f7  # 📷 camera
+1f4f9  # 📹 video camera
+1f3a5  # 🎥 movie camera
+1f399  # 🎙 studio microphone
+1f3a4  # 🎤 microphone
+
+# === Music ===
+1f3b5  # 🎵 musical note
+1f3b6  # 🎶 musical notes
+1f3bc  # 🎼 musical score
+1f3b9  # 🎹 musical keyboard
+1f3b8  # 🎸 guitar
+1f3ba  # 🎺 trumpet
+1f3bb  # 🎻 violin
+1f941  # 🥁 drum
+
+# === Documents & books ===
+1f4c4  # 📄 page facing up
+1f4c3  # 📃 page with curl
+1f4d1  # 📑 bookmark tabs
+1f4d2  # 📒 ledger
+1f4d5  # 📕 closed book
+1f4d7  # 📗 green book
+1f4d8  # 📘 blue book
+1f4d9  # 📙 orange book
+1f4da  # 📚 books
+1f4d6  # 📖 open book
+
+# === Writing ===
+1f4dd  # 📝 memo
+270f   # ✏ pencil
+2712   # ✒ black nib
+1f58a  # 🖊 pen
+1f58b  # 🖋 fountain pen
+1f58c  # 🖌 paintbrush
+
+# === Money ===
+1f4b0  # 💰 money bag
+1f4b4  # 💴 yen banknote
+1f4b5  # 💵 dollar banknote
+1f4b6  # 💶 euro banknote
+1f4b7  # 💷 pound banknote
+1f4b3  # 💳 credit card
+
+# === Notifications & time ===
+1f514  # 🔔 bell
+1f515  # 🔕 bell with slash
+23f0   # ⏰ alarm clock
+23f3   # ⏳ hourglass not done
+231b   # ⌛ hourglass done
+1f550  # 🕐 one o'clock
+
+# === Arrows ===
+2b05   # ⬅ leftwards black arrow
+27a1   # ➡ black rightwards arrow
+2b06   # ⬆ upwards black arrow
+2b07   # ⬇ downwards black arrow
+21a9   # ↩ leftwards arrow with hook
+21aa   # ↪ rightwards arrow with hook
+2196   # ↖ north west arrow
+2197   # ↗ north east arrow
+2198   # ↘ south east arrow
+2199   # ↙ south west arrow
+2194   # ↔ left right arrow
+2195   # ↕ up down arrow
+
+# === Symbols ===
+267b   # ♻ recycling
+267f   # ♿ wheelchair
+1f6ad  # 🚭 no smoking
+2622   # ☢ radioactive
+2623   # ☣ biohazard

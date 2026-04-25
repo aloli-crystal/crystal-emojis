@@ -1,0 +1,30 @@
+= Journal des modifications
+:toc: left
+:toc-title: Versions
+:toclevels: 2
+
+== v0.1.0 — 2026-04-26
+
+Première version publique. Set curé de ~200 emojis rendus en SVG,
+embarqués à la compilation. Source :
+https://github.com/jdecked/twemoji[Twemoji] (MIT).
+
+* **208 emojis** couvrant les catégories : status & validation,
+  cercles et carrés colorés, formes géométriques, visages
+  (classiques + émotions), mains & gestes, outils dev, sécurité,
+  communication, lieux, nature, média, musique, documents,
+  écriture, argent, notifications & temps, flèches, symboles
+  divers.
+* **API** : `CrystalEmojis.svg(char)`, `.svg(codepoint)`,
+  `.includes?(char)`, `.size`, `.keys`, `.each { |key, svg| … }`.
+* **Embedding à la compilation** via la macro `read_file` — pas
+  besoin du dossier `data/` à l'exécution.
+* Couvre les « 90 % cas » des emojis qu'on utilise réellement dans
+  un document technique. Pour le set complet ~3700 emojis (y
+  compris les jointures ZWJ, tons de peau, drapeaux régionaux),
+  utiliser `crystal-emojis-full`.
+* MIT pour le code Crystal ; les SVG embarqués sont sous Twemoji
+  CC-BY 4.0 (attribution à Twitter/Twemoji requise lors de la
+  redistribution).
+* README bilingue (EN + FR), CI, lint ameba.
+* **14 tests unitaires, tous verts.**
