@@ -1,31 +1,39 @@
+require "./crystal_emojis/cache"
+
 # Embeds ~200 commonly-used emoji as SVG assets from Twemoji
-# (https://github.com/jdecked/twemoji, MIT). Exposes a minimal
-# Crystal API: lookup by codepoint or by `Char`, enumeration,
-# and detection helpers.
+# (https://github.com/jdecked/twemoji), with an opt-in on-disk
+# cache for the rest of the catalogue.
 #
-# All SVGs are read and inlined at compile time (via the
+# All curated SVGs are read and inlined at compile time (via the
 # `read_file` macro), so consumers don't need to ship the
 # `data/` directory alongside their compiled binaries.
 #
-# For the full ~3700-emoji set, use the sibling shard
-# `crystal-emojis-full` instead — same API, larger binary
-# footprint (~7-12 MB embedded vs ~840 KB here).
+# **Lookup chain** :
+#
+# 1. The 208 curated emojis are baked into the binary and served
+#    from RAM.
+# 2. Anything else is looked up in the on-disk cache (cf.
+#    `CrystalEmojis::Cache`). The cache is empty by default —
+#    populate it via `CrystalEmojis::Cache.pull` (API) or
+#    `crystal-emojis pull` (CLI).
+# 3. If still not found, returns `nil` and the caller decides
+#    (typically substitutes with `?` or text fallback).
+#
+# **Why two layers** : the curated set covers the 90 % case of
+# technical documentation (status, colours, dev tools…) at near-zero
+# cost (~840 KB embedded). The cache covers the long tail without
+# inflating every dependent binary by 18 MB.
 module CrystalEmojis
   # Version of this Crystal shard.
-  VERSION = "0.1.0"
+  VERSION = "0.2.0"
 
-  # Version of Twemoji whose assets are embedded.
+  # Version of Twemoji whose curated assets are embedded.
   TWEMOJI_VERSION = "main"
 
-  # Compile-time hash of `codepoint_key => svg_content`. Codepoint
-  # keys are lowercase hex, multi-codepoint sequences joined with
-  # `-` (Twemoji file naming convention). Built from the curated
-  # `data/svg/MANIFEST.txt` list.
-  #
-  # We use a local helper file (`MANIFEST.txt`) rather than walking
-  # the directory at compile time because `read_file` macros work
-  # on a known set of paths but Crystal's compile-time
-  # introspection cannot enumerate a directory generically.
+  # Compile-time hash of `codepoint_key => svg_content` for the
+  # curated set. Codepoint keys are lowercase hex, multi-codepoint
+  # sequences joined with `-` (Twemoji file naming convention).
+  # Built from `data/svg/MANIFEST.txt`.
   EMOJIS = begin
     map = {} of String => String
     {% for line in read_file(__DIR__ + "/../data/svg/MANIFEST.txt").split("\n") %}
@@ -39,14 +47,15 @@ module CrystalEmojis
 
   # Returns the raw SVG content for a single-codepoint emoji.
   # Pass a `Char` (most natural) or an `Int32` codepoint.
-  # Returns `nil` when the codepoint is not in this curated set —
-  # callers should fall back to text or to the larger
-  # `crystal-emojis-full` set.
+  #
+  # Looks up first in the embedded curated set, then in the
+  # on-disk cache. Returns `nil` when neither has the emoji —
+  # callers should fall back to text.
   #
   # ```
-  # CrystalEmojis.svg('✅')    # => "<svg ...>"
-  # CrystalEmojis.svg(0x2705) # => "<svg ...>"  (same)
-  # CrystalEmojis.svg('é')    # => nil          (not an emoji)
+  # CrystalEmojis.svg('✅') # => "<svg ...>"  (curated)
+  # CrystalEmojis.svg('🦄') # => "<svg ...>" if cache populated, else nil
+  # CrystalEmojis.svg('é') # => nil          (not an emoji)
   # ```
   def self.svg(char : Char) : String?
     svg(char.ord)
@@ -54,41 +63,50 @@ module CrystalEmojis
 
   # :ditto:
   def self.svg(codepoint : Int32) : String?
-    EMOJIS[codepoint_key(codepoint)]?
+    key = codepoint_key(codepoint)
+    EMOJIS[key]? || Cache.svg(key)
   end
 
   # Returns the SVG for a multi-codepoint emoji sequence (e.g. an
   # emoji modified by a skin-tone or zero-width-joiner). Pass an
   # array of codepoints in source order.
   #
+  # The curated set focuses on single-codepoint emojis ; sequences
+  # are typically only available once the cache has been populated.
+  #
   # ```
   # # 👨‍💻 = MAN (1F468) + ZWJ (200D) + LAPTOP (1F4BB)
   # CrystalEmojis.svg([0x1F468, 0x200D, 0x1F4BB])
   # ```
   def self.svg(codepoints : Array(Int32)) : String?
-    EMOJIS[codepoints.map(&.to_s(16)).join('-')]?
+    key = codepoints.map(&.to_s(16)).join('-')
+    EMOJIS[key]? || Cache.svg(key)
   end
 
-  # Returns `true` when this curated set covers the given codepoint.
-  # Cheaper than `svg(...)` because it returns `nil`/non-nil without
-  # copying the SVG string.
+  # Returns `true` when **either** the curated set **or** the cache
+  # has an SVG for the given codepoint. Cheaper than `svg(...)` for
+  # the curated branch (no string copy), but the cache branch still
+  # has to stat the file.
   def self.includes?(char : Char) : Bool
     includes?(char.ord)
   end
 
   # :ditto:
   def self.includes?(codepoint : Int32) : Bool
-    EMOJIS.has_key?(codepoint_key(codepoint))
+    key = codepoint_key(codepoint)
+    EMOJIS.has_key?(key) || !Cache.svg(key).nil?
   end
 
-  # Iterates over every (key, svg) pair in the embedded set.
-  # `key` is the lowercase-hex Twemoji-style identifier
-  # (`"2705"` for ✅, `"1f468-200d-1f4bb"` for 👨‍💻).
+  # Iterates over every (key, svg) pair in the **embedded** curated
+  # set only — the cache is intentionally NOT walked, since it can
+  # grow to thousands of entries and most callers using `each` want
+  # to enumerate the small fast set, not the disk one.
   def self.each(& : String, String ->) : Nil
     EMOJIS.each { |k, v| yield k, v }
   end
 
-  # Returns the number of emojis embedded in this set.
+  # Returns the number of emojis in the **embedded** curated set
+  # (does NOT count cached SVGs ; see `Cache.size` for that).
   def self.size : Int32
     EMOJIS.size
   end

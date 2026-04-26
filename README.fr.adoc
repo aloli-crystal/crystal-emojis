@@ -1,118 +1,192 @@
-= crystal-emojis-lite
+= crystal-emojis
 :toc: macro
 :toclevels: 2
 
-~200 emojis courants embarqués comme SVG, issus de
-https://github.com/jdecked/twemoji[Twemoji] (MIT). Crystal pur,
-sans dépendance d'exécution.
+Rendu d'emojis pour Crystal — set curé de ~200 SVG embarqués depuis
+https://github.com/jdecked/twemoji[Twemoji], plus un cache disque
+optionnel pour le reste du catalogue (~4000 SVG, ~18 Mo). Crystal
+pur, sans dépendance d'exécution pour le set curé.
 
 🇬🇧 Read this in English: link:README.adoc[README.adoc]
 
-Pour le set complet ~3700 emojis, utilisez le shard frère
-`crystal-emojis-full` — même API, empreinte binaire plus lourde
-(~7-12 Mo embarqués vs ~840 Ko ici).
-
 toc::[]
 
-== Pourquoi
+== Migration depuis crystal-emojis-lite v0.1
 
-Les bibliothèques Crystal qui rendent du texte en PDF, SVG ou
-HTML tombent régulièrement sur le mode d'échec « tofu silencieux »
-quand un emoji apparaît : la police sous-jacente n'a pas de
-glyphe pour lui, le renderer émet un rectangle vide, sans
-avertissement.
+Le shard a été renommé de `crystal-emojis-lite` à `crystal-emojis`
+en v0.2. Pour migrer :
 
-Le bon correctif est de rendre les emojis comme glyphes SVG
-embarqués (la même technique que
-https://github.com/aloli-crystal/crystal-flags[crystal-flags]
-utilise pour les drapeaux). Ce shard est la bibliothèque d'assets
-des ~200 emojis les plus courants ; le consommateur (par exemple
-crystal-asciidoctor-pdf) détecte les codepoints emoji et appelle
-`page.svg(...)` avec le SVG retourné par
-`CrystalEmojis.svg(char)`.
+[source,yaml]
+----
+# Avant (v0.1)
+dependencies:
+  crystal-emojis-lite:
+    github: aloli-crystal/crystal-emojis-lite
 
-== Contenu du set lite
+# Après (v0.2)
+dependencies:
+  crystal-emojis:
+    github: aloli-crystal/crystal-emojis
+    version: "~> 0.2"
+----
 
-~200 emojis couvrant les catégories les plus susceptibles
-d'apparaître dans des documents techniques :
+L'API Crystal est inchangée (nom de module `CrystalEmojis`).
+`crystal-emojis-full` a été fusionné dans ce seul shard (via le
+mécanisme de cache) et va être supprimé.
 
-* Status & validation : ✅ ❌ ⚠ ✔ ✖ ❗ ❓ ⭕ 🆗 🆖 ➕ ➖
-* Cercles et carrés colorés : 🔴 🟢 🟡 🔵 🟣 ⚫ ⚪ 🟤 + carrés
-* Visages classiques + émotions
-* Mains et gestes : 👍 👎 👌 🤝 🙏
-* Outils dev : 💻 ⌨ ⚙ 🔧 🛠 📋 📌 📎 📊 📈 📉
-* Sécurité : 🔑 🔒 🔓 🔐 🛡
-* Communication : 📧 📞 💬 📢
-* Musique : 🎵 🎶 🎼 🎹 🎸 🎻 🥁
-* Documents, écriture, argent, temps, flèches, symboles…
+== Comment ça marche
 
-Liste complète dans `data/svg/MANIFEST.txt`.
+Lookup en deux couches :
+
+. **Set curé embarqué** : ~208 emojis cuits dans votre binaire à
+  la compilation (~840 Ko). Couvre le 90 % des cas de
+  documentation technique : status, couleurs, outils dev,
+  visages courants.
+. **Cache disque** : le reste du catalogue Twemoji, téléchargé à
+  la demande et stocké sous `$XDG_CACHE_HOME/crystal-emojis/svg/`.
+  Vide par défaut — vous (ou votre outil aval) le populez.
+
+Comme ça chaque consommateur ne paie que pour ce dont il a
+besoin : le set curé est toujours là, la longue traîne (~3800 SVG
+supplémentaires) ne s'embarque que sur demande explicite.
 
 == Installation
 
 [source,yaml]
 ----
 dependencies:
-  crystal-emojis-lite:
-    github: aloli-crystal/crystal-emojis-lite
-    version: "~> 0.1"
+  crystal-emojis:
+    github: aloli-crystal/crystal-emojis
+    version: "~> 0.2"
 ----
 
-== Utilisation
+== API (utilisable depuis votre application Crystal)
 
 [source,crystal]
 ----
-require "crystal-emojis-lite"
+require "crystal-emojis"
 
-# Lookup par Char (le plus naturel).
-svg_string = CrystalEmojis.svg('✅')
-# => "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 36 36\">…</svg>"
+# === Lookup ===
+# Cherche d'abord dans le set embarqué, puis dans le cache disque.
+CrystalEmojis.svg('✅')   # => "<svg ...>"
+CrystalEmojis.svg(0x2705) # => idem
+CrystalEmojis.svg('🦄')   # => nil si cache vide, "<svg ...>" une fois mis en cache
 
-# Ou par codepoint.
-CrystalEmojis.svg(0x2705) == CrystalEmojis.svg('✅')  # => true
+# Séquences multi-codepoint (jointures ZWJ, tons de peau, drapeaux)
+# typiquement disponibles uniquement depuis le cache.
+CrystalEmojis.svg([0x1F468, 0x200D, 0x1F4BB])  # 👨‍💻
 
-# Détection (moins cher que .svg si on ne veut qu'un yes/no).
-CrystalEmojis.includes?('✅')  # => true
-CrystalEmojis.includes?('a')   # => false
+# === Gestion du cache (programmatique) ===
+# Déclencher le téléchargement depuis votre application — pas
+# besoin de la CLI.
+CrystalEmojis::Cache.pull
+# => télécharge ~4000 SVG dans le cache utilisateur, retourne le compte
 
-# Séquences multi-codepoint (tons de peau, jointures ZWJ) — aucune
-# dans lite, mais l'API les accepte pour compatibilité avec le
-# set complet.
-CrystalEmojis.svg([0x1F468, 0x200D, 0x1F4BB])  # => nil dans lite
+# Surcharger la source — pointer vers votre miroir privé.
+CrystalEmojis::Cache.pull(source: "https://nas.aloli.local/twemoji/svg")
 
-# Itération / découverte.
-CrystalEmojis.size              # => 208
-CrystalEmojis.keys              # => ["1f196", "1f197", "1f308", …]
-CrystalEmojis.each do |key, svg|
-  # …
+# Écrire dans le cache système (nécessite root, utile pour les
+# serveurs FreeBSD provisionnés via crystal-beryl, etc.).
+CrystalEmojis::Cache.pull(system: true)
+
+# Inspection
+CrystalEmojis::Cache.dir         # => "/Users/.../Library/Caches/crystal-emojis/svg"
+CrystalEmojis::Cache.size        # => 0 initialement, ~4001 après pull
+CrystalEmojis::Cache.populated?  # => false puis true
+
+# Vérification préalable avant de traiter un document — si le
+# cache n'est pas encore peuplé, décider de la marche à suivre
+# (avertir l'utilisateur, déclencher .pull, ou retomber
+# gracieusement sur du texte).
+unless CrystalEmojis::Cache.populated?
+  puts "Lancez `crystal-emojis pull` pour la couverture complète."
 end
 ----
 
-== Limitations
+== CLI
 
-* Emojis à un seul codepoint uniquement. Les jointures ZWJ, les
-  variantes de tons de peau et les séquences de drapeau sont
-  absentes (les usagers de « lite » sont supposés en avoir
-  rarement besoin — voir `crystal-flags` pour les drapeaux et
-  `crystal-emojis-full` pour tout le reste).
-* Quelques dingbats simples (← → ↑ ↓ ☐ ✓ ✗) n'ont pas de glyphe
-  Twemoji et sont intentionnellement absents. Repli vers du
-  texte ou une police comme DejaVu Sans pour ces cas-là.
+[source,shell]
+----
+# Compiler le binaire une fois.
+shards build --release crystal-emojis
 
-== Crédits des polices
+# Peupler le cache utilisateur avec le catalogue Twemoji complet.
+crystal-emojis pull
+# Téléchargement vers : /Users/.../Library/Caches/crystal-emojis/svg
+# Source              : https://raw.githubusercontent.com/jdecked/twemoji/main/assets/svg
+# Patientez (≈ 4000 SVG, ~18 Mo)...
+# Téléchargé : 4001 nouveau(x) SVG (cache total : 4001)
+
+# Utiliser un miroir privé.
+crystal-emojis pull --source https://votre.miroir/twemoji/svg
+
+# Cache système (configurations multi-utilisateurs).
+crystal-emojis pull --system
+
+# Inspection.
+crystal-emojis info
+# Emplacement : /Users/.../Library/Caches/crystal-emojis/svg
+# Taille      : 4001 SVG
+# Embarqués   : 208 (curated set)
+
+# Vider le cache.
+crystal-emojis purge
+----
+
+=== Exigences pour un miroir privé
+
+La commande `pull` auto-découvre la liste des codepoints
+disponibles de deux façons :
+
+. **`MANIFEST.txt` à `<source>/MANIFEST.txt`** — un codepoint par
+  ligne, hex minuscule, séquences multi-codepoint jointes par `-`.
+  Commentaires (`#`) et lignes vides ignorés. **C'est l'interface
+  recommandée pour un miroir privé.**
+. **Fallback API GitHub** — fonctionne pour le repo Twemoji amont
+  uniquement.
+
+Donc un miroir privé doit juste héberger des fichiers `<key>.svg`
+plus un `MANIFEST.txt` qui les liste. Un serveur statique nginx
+de 2 lignes suffit.
+
+=== Emplacement du cache
+
+[cols="1,3"]
+|===
+| OS / mode | Chemin par défaut
+
+| macOS (utilisateur)
+| `~/Library/Caches/crystal-emojis/svg/`
+
+| Linux/FreeBSD (utilisateur)
+| `$XDG_CACHE_HOME/crystal-emojis/svg/` (défaut `~/.cache/crystal-emojis/svg/`)
+
+| Tout (système via `--system`)
+| `/var/cache/crystal-emojis/svg/`
+
+| Tout (surcharge)
+| variable d'env `$CRYSTAL_EMOJIS_CACHE_DIR`
+|===
+
+== Attribution
 
 Twemoji © Twitter, Inc et autres contributeurs. **CC-BY 4.0** —
 voir le texte complet dans `data/svg/LICENSE-twemoji.txt`.
 
-**Attribution requise** : si vous redistribuez les graphiques ou
-construisez un travail dérivé qui les inclut, vous devez créditer
-Twemoji. Attribution recommandée :
+**Attribution requise** lors de la redistribution :
 
 [source]
 ----
 Graphismes : Twemoji, © Twitter, Inc, CC-BY 4.0
 https://github.com/jdecked/twemoji
 ----
+
+== Récapitulatif des licences
+
+* **Code Crystal** : MIT, voir link:LICENSE[LICENSE]
+* **Graphiques SVG embarqués** : Twemoji CC-BY 4.0
+* **Graphiques SVG en cache** : même Twemoji CC-BY 4.0 (téléchargés
+  à la demande)
 
 == Développement
 
@@ -123,10 +197,3 @@ crystal spec
 bin/ameba
 crystal tool format src/ spec/
 ----
-
-== Récapitulatif des licences
-
-* **Code Crystal** : MIT, voir link:LICENSE[LICENSE]
-* **Graphiques SVG embarqués** : Twemoji CC-BY 4.0, voir
-  `data/svg/LICENSE-twemoji.txt`. Attribution à Twitter/Twemoji
-  requise lors de la redistribution.

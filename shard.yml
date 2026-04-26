@@ -1,10 +1,10 @@
-name: crystal-emojis-lite
-version: 0.1.0
+name: crystal-emojis
+version: 0.2.0
 
 description: |
-  ~200 commonly-used emoji as embedded SVG, sourced from Twemoji
-  (MIT). Pure Crystal, no runtime dependency. For the full
-  ~3700-emoji set, use the sibling shard `crystal-emojis-full`.
+  ~200 commonly-used emoji as embedded SVG, plus an opt-in on-disk
+  cache for the rest of the Twemoji catalogue (~4000 SVG, ~18 MB).
+  Sourced from Twemoji (CC-BY 4.0). Pure Crystal.
 
 authors:
   - Philippe Nénert <philippe@aloli.fr>
@@ -15,5 +15,9 @@ development_dependencies:
   ameba:
     github: crystal-ameba/ameba
     version: "~> 1.6"
+
+targets:
+  crystal-emojis:
+    main: src/cli.cr
 
 crystal: ">= 1.19.0"

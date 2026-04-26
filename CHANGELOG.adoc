@@ -3,25 +3,64 @@
 :toc-title: Versions
 :toclevels: 2
 
-== v0.1.0 — 2026-04-26
+== v0.2.0 — 2026-04-26
 
-First public release. Curated set of ~200 emoji rendered as SVG,
-embedded at compile time. Sourced from
-https://github.com/jdecked/twemoji[Twemoji] (MIT).
+**Repo renamed and shard merged.** What used to be
+`crystal-emojis-lite` is now `crystal-emojis` ; what used to be
+`crystal-emojis-full` is being deleted, its functionality folded
+into this single shard via the new on-disk cache.
 
-* **208 emoji** covering status & validation, colour circles &
-  squares, geometric shapes, faces (classic + emotion), hands &
-  gestures, dev tools, security, communication, places, nature,
-  media, music, documents, writing, money, notifications & time,
-  arrows, miscellaneous symbols.
-* **API** : `CrystalEmojis.svg(char)`, `.svg(codepoint)`,
-  `.includes?(char)`, `.size`, `.keys`, `.each { |key, svg| … }`.
-* **Compile-time embedding** via the `read_file` macro — no
-  runtime `data/` directory needed.
-* Covers the « 90 % case » of emojis you'd actually use in a
-  technical document. For the full ~3700-emoji set (including
-  ZWJ joins, skin tones, regional flags), use `crystal-emojis-full`.
-* MIT for the Crystal code ; embedded SVGs are Twemoji CC-BY 4.0
-  (attribution to Twitter/Twemoji required when redistributing).
-* Bilingual README (EN + FR), CI, ameba lint.
-* **14 unit tests, all green.**
+=== Added
+
+* **`CrystalEmojis::Cache` module** — on-disk extension of the
+  embedded curated set. Lookup chain : embedded set first, then
+  cache. Enables full Twemoji coverage (~4000 SVG) without
+  inflating dependent binaries.
+* **`Cache.pull(source:, system:)` API** — programmatic download
+  trigger. Apps can populate the cache from inside their own
+  Crystal code (no CLI dependency), and configure source URL
+  (private mirrors) and target (`user` vs `system`-wide cache).
+* **`Cache.dir`, `Cache.size`, `Cache.populated?`** — inspection.
+* **`bin/crystal-emojis` CLI** with sub-commands `pull`, `info`,
+  `purge` and short/long flags `-s/--source`, `--system`,
+  `-v/--version`, `-h/--help`.
+* **Custom mirror support** — `pull --source URL` lets you point
+  at a private NAS / Nexus / S3 bucket. Mirrors should ship a
+  `MANIFEST.txt` listing the codepoint keys ; the upstream Twemoji
+  repo is auto-discovered via the GitHub tree API.
+* **XDG-conventional cache path** with macOS variant + `--system`
+  override + `CRYSTAL_EMOJIS_CACHE_DIR` env var.
+
+=== Changed
+
+* `crystal-emojis-lite` → `crystal-emojis` (GitHub repo renamed).
+* `CrystalEmojis.svg` now falls back into the cache after the
+  embedded set — same signature, broader coverage.
+
+=== Deprecated / removed
+
+* `crystal-emojis-full` shard is being deleted. Use this shard
+  with `crystal-emojis pull` instead.
+
+=== Migration from v0.1
+
+In your `shard.yml` :
+
+[source,yaml]
+----
+# Before
+crystal-emojis-lite:
+  github: aloli-crystal/crystal-emojis-lite
+
+# After
+crystal-emojis:
+  github: aloli-crystal/crystal-emojis
+  version: "~> 0.2"
+----
+
+The Crystal API is unchanged (module name `CrystalEmojis`).
+
+== v0.1.0 — 2026-04-26 *(as `crystal-emojis-lite`)*
+
+First public release. 208 curated emoji embedded as SVG. See the
+GitHub history for details.
