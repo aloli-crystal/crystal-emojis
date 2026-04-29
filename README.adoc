@@ -1,4 +1,4 @@
-= crystal-emojis
+= emojis
 :toc: macro
 :toclevels: 2
 
@@ -11,27 +11,27 @@ Pure Crystal, no runtime dependency for the curated set.
 
 toc::[]
 
-== Migration from crystal-emojis-lite v0.1
+== Migration from emojis-lite v0.1
 
-The shard was renamed from `crystal-emojis-lite` to `crystal-emojis`
+The shard was renamed from `emojis-lite` to `emojis`
 in v0.2. To migrate :
 
 [source,yaml]
 ----
 # Before (v0.1)
 dependencies:
-  crystal-emojis-lite:
-    github: aloli-crystal/crystal-emojis-lite
+  emojis-lite:
+    github: aloli-crystal/emojis-lite
 
 # After (v0.2)
 dependencies:
-  crystal-emojis:
-    github: aloli-crystal/crystal-emojis
+  emojis:
+    github: aloli-crystal/emojis
     version: "~> 0.2"
 ----
 
 The Crystal API is unchanged (module name `CrystalEmojis`).
-`crystal-emojis-full` has been merged into this single shard
+`emojis-full` has been merged into this single shard
 (via the cache mechanism) and is going to be deleted.
 
 == How it works
@@ -42,7 +42,7 @@ Two-layer lookup :
   at compile time (~840 KB). Covers the 90 % case of technical
   documentation : status, colours, dev tools, common faces.
 . **On-disk cache** : the rest of the Twemoji catalogue, downloaded
-  on demand and stored under `$XDG_CACHE_HOME/crystal-emojis/svg/`.
+  on demand and stored under `$XDG_CACHE_HOME/emojis/svg/`.
   Empty by default — you (or your downstream tool) populate it.
 
 This way every consumer pays only for what they need : the curated
@@ -54,8 +54,8 @@ when explicitly requested.
 [source,yaml]
 ----
 dependencies:
-  crystal-emojis:
-    github: aloli-crystal/crystal-emojis
+  emojis:
+    github: aloli-crystal/emojis
     version: "~> 0.2"
 ----
 
@@ -63,7 +63,7 @@ dependencies:
 
 [source,crystal]
 ----
-require "crystal-emojis"
+require "emojis"
 
 # === Lookup ===
 # Pulls from the embedded set first, then from the on-disk cache.
@@ -84,11 +84,11 @@ CrystalEmojis::Cache.pull
 CrystalEmojis::Cache.pull(source: "https://nas.aloli.local/twemoji/svg")
 
 # Write to the system-wide cache (needs root, useful for FreeBSD
-# servers provisioned via crystal-beryl, etc.).
+# servers provisioned via beryl, etc.).
 CrystalEmojis::Cache.pull(system: true)
 
 # Inspection
-CrystalEmojis::Cache.dir         # => "/Users/.../Library/Caches/crystal-emojis/svg"
+CrystalEmojis::Cache.dir         # => "/Users/.../Library/Caches/emojis/svg"
 CrystalEmojis::Cache.size        # => 0 initially, ~4001 after pull
 CrystalEmojis::Cache.populated?  # => false then true
 
@@ -96,7 +96,7 @@ CrystalEmojis::Cache.populated?  # => false then true
 # isn't populated yet, decide what to do (warn the user, trigger
 # .pull, or just gracefully fall back to text).
 unless CrystalEmojis::Cache.populated?
-  puts "Run `crystal-emojis pull` for full emoji coverage."
+  puts "Run `emojis pull` for full emoji coverage."
 end
 ----
 
@@ -105,29 +105,29 @@ end
 [source,shell]
 ----
 # Build the binary once.
-shards build --release crystal-emojis
+shards build --release emojis
 
 # Populate the user cache with the full Twemoji catalogue.
-crystal-emojis pull
-# Téléchargement vers : /Users/.../Library/Caches/crystal-emojis/svg
+emojis pull
+# Téléchargement vers : /Users/.../Library/Caches/emojis/svg
 # Source              : https://raw.githubusercontent.com/jdecked/twemoji/main/assets/svg
 # Patientez (≈ 4000 SVG, ~18 Mo)...
 # Téléchargé : 4001 nouveau(x) SVG (cache total : 4001)
 
 # Use a custom mirror.
-crystal-emojis pull --source https://your.mirror/twemoji/svg
+emojis pull --source https://your.mirror/twemoji/svg
 
 # System-wide cache (multi-user setups).
-crystal-emojis pull --system
+emojis pull --system
 
 # Inspection.
-crystal-emojis info
-# Emplacement : /Users/.../Library/Caches/crystal-emojis/svg
+emojis info
+# Emplacement : /Users/.../Library/Caches/emojis/svg
 # Taille      : 4001 SVG
 # Embarqués   : 208 (curated set)
 
 # Wipe the cache.
-crystal-emojis purge
+emojis purge
 ----
 
 === Custom mirror requirements
@@ -153,13 +153,13 @@ enough.
 | OS / mode | Default path
 
 | macOS (user)
-| `~/Library/Caches/crystal-emojis/svg/`
+| `~/Library/Caches/emojis/svg/`
 
 | Linux/FreeBSD (user)
-| `$XDG_CACHE_HOME/crystal-emojis/svg/` (default `~/.cache/crystal-emojis/svg/`)
+| `$XDG_CACHE_HOME/emojis/svg/` (default `~/.cache/emojis/svg/`)
 
 | Any (system-wide via `--system`)
-| `/var/cache/crystal-emojis/svg/`
+| `/var/cache/emojis/svg/`
 
 | Any (override)
 | `$CRYSTAL_EMOJIS_CACHE_DIR` env var

@@ -22,7 +22,7 @@ module CrystalEmojis
   #
   # # …or write to a system-wide cache (needs root, useful for
   # # multi-user setups, e.g. a FreeBSD server provisioned via
-  # # crystal-beryl).
+  # # beryl).
   # CrystalEmojis::Cache.pull(system: true)
   #
   # # Inspection

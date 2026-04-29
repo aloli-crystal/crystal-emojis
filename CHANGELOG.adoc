@@ -3,11 +3,24 @@
 :toc-title: Versions
 :toclevels: 2
 
+== v0.2.1 — 2026-04-29
+
+=== Changed
+
+* **GitHub repository renamed** from `aloli-crystal/crystal-emojis` to
+  `aloli-crystal/emojis` (Aloli naming convention: original creations
+  drop the `crystal-` prefix). Old links redirect automatically.
+* `name:` field in `shard.yml` updated from `crystal-emojis` to `emojis`.
+* Build target / CLI binary renamed `crystal-emojis` → `emojis`
+  (`shards build emojis` → `bin/emojis`).
+* New entry-point shim `src/emojis.cr` (loads `src/crystal_emojis.cr`);
+  `require "crystal-emojis"` → `require "emojis"`.
+
 == v0.2.0 — 2026-04-26
 
 **Repo renamed and shard merged.** What used to be
-`crystal-emojis-lite` is now `crystal-emojis` ; what used to be
-`crystal-emojis-full` is being deleted, its functionality folded
+`emojis-lite` is now `emojis` ; what used to be
+`emojis-full` is being deleted, its functionality folded
 into this single shard via the new on-disk cache.
 
 === Added
@@ -21,7 +34,7 @@ into this single shard via the new on-disk cache.
   Crystal code (no CLI dependency), and configure source URL
   (private mirrors) and target (`user` vs `system`-wide cache).
 * **`Cache.dir`, `Cache.size`, `Cache.populated?`** — inspection.
-* **`bin/crystal-emojis` CLI** with sub-commands `pull`, `info`,
+* **`bin/emojis` CLI** with sub-commands `pull`, `info`,
   `purge` and short/long flags `-s/--source`, `--system`,
   `-v/--version`, `-h/--help`.
 * **Custom mirror support** — `pull --source URL` lets you point
@@ -33,14 +46,14 @@ into this single shard via the new on-disk cache.
 
 === Changed
 
-* `crystal-emojis-lite` → `crystal-emojis` (GitHub repo renamed).
+* `emojis-lite` → `emojis` (GitHub repo renamed).
 * `CrystalEmojis.svg` now falls back into the cache after the
   embedded set — same signature, broader coverage.
 
 === Deprecated / removed
 
-* `crystal-emojis-full` shard is being deleted. Use this shard
-  with `crystal-emojis pull` instead.
+* `emojis-full` shard is being deleted. Use this shard
+  with `emojis pull` instead.
 
 === Migration from v0.1
 
@@ -49,18 +62,18 @@ In your `shard.yml` :
 [source,yaml]
 ----
 # Before
-crystal-emojis-lite:
-  github: aloli-crystal/crystal-emojis-lite
+emojis-lite:
+  github: aloli-crystal/emojis-lite
 
 # After
-crystal-emojis:
-  github: aloli-crystal/crystal-emojis
+emojis:
+  github: aloli-crystal/emojis
   version: "~> 0.2"
 ----
 
 The Crystal API is unchanged (module name `CrystalEmojis`).
 
-== v0.1.0 — 2026-04-26 *(as `crystal-emojis-lite`)*
+== v0.1.0 — 2026-04-26 *(as `emojis-lite`)*
 
 First public release. 208 curated emoji embedded as SVG. See the
 GitHub history for details.
