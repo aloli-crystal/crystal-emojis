@@ -1,7 +1,7 @@
 require "http/client"
 require "uri"
 
-module CrystalEmojis
+module Emojis
   # On-disk cache of emoji SVGs that aren't part of the curated
   # set embedded at compile time. Lets the consumer extend coverage
   # to the full Twemoji catalogue (~4000 SVG, ~18 MB) without
@@ -12,37 +12,37 @@ module CrystalEmojis
   # 1. **From your own Crystal app, via the API** (no CLI needed) :
   #
   #    ```
-  # require "crystal-emojis"
+  # require "emojis"
   #
   # # Pull every Twemoji SVG into the user-level cache.
-  # CrystalEmojis::Cache.pull
+  # Emojis::Cache.pull
   #
   # # …or override the source (private mirror, NAS, Nexus, etc.)
-  # CrystalEmojis::Cache.pull(source: "https://nas.aloli.local/twemoji/svg")
+  # Emojis::Cache.pull(source: "https://nas.aloli.local/twemoji/svg")
   #
   # # …or write to a system-wide cache (needs root, useful for
   # # multi-user setups, e.g. a FreeBSD server provisioned via
   # # beryl).
-  # CrystalEmojis::Cache.pull(system: true)
+  # Emojis::Cache.pull(system: true)
   #
   # # Inspection
-  # CrystalEmojis::Cache.dir        # => "/Users/.../Library/Caches/crystal-emojis/svg"
-  # CrystalEmojis::Cache.size       # => 4001 (number of cached SVGs)
-  # CrystalEmojis::Cache.populated? # => true once .pull has run
+  # Emojis::Cache.dir        # => "/Users/.../Library/Caches/emojis/svg"
+  # Emojis::Cache.size       # => 4001 (number of cached SVGs)
+  # Emojis::Cache.populated? # => true once .pull has run
   #    ```
   #
   # 2. **From the command line** :
   #
-  #        $ crystal-emojis pull                                   # default source
-  #        $ crystal-emojis pull --source https://example/svg/     # custom source
-  #        $ crystal-emojis pull --system                          # system-wide
+  #        $ emojis pull                                   # default source
+  #        $ emojis pull --source https://example/svg/     # custom source
+  #        $ emojis pull --system                          # system-wide
   #
   # **Cache location** (XDG Base Directory + macOS convention) :
   #
-  # * Linux/FreeBSD : `$XDG_CACHE_HOME/crystal-emojis/svg/`
-  #                   (default `~/.cache/crystal-emojis/svg/`)
-  # * macOS         : `~/Library/Caches/crystal-emojis/svg/`
-  # * System-wide   : `/var/cache/crystal-emojis/svg/`
+  # * Linux/FreeBSD : `$XDG_CACHE_HOME/emojis/svg/`
+  #                   (default `~/.cache/emojis/svg/`)
+  # * macOS         : `~/Library/Caches/emojis/svg/`
+  # * System-wide   : `/var/cache/emojis/svg/`
   #                   (override via `CRYSTAL_EMOJIS_CACHE_DIR` env var)
   module Cache
     # Default upstream source for SVG downloads. Switch via the
@@ -57,15 +57,15 @@ module CrystalEmojis
         return override
       end
       if system
-        "/var/cache/crystal-emojis/svg"
+        "/var/cache/emojis/svg"
       elsif (xdg = ENV["XDG_CACHE_HOME"]?)
-        File.join(xdg, "crystal-emojis", "svg")
+        File.join(xdg, "emojis", "svg")
       else
         case Crystal::DESCRIPTION
         when /darwin/, /macos/
-          File.join(Path.home.to_s, "Library", "Caches", "crystal-emojis", "svg")
+          File.join(Path.home.to_s, "Library", "Caches", "emojis", "svg")
         else
-          File.join(Path.home.to_s, ".cache", "crystal-emojis", "svg")
+          File.join(Path.home.to_s, ".cache", "emojis", "svg")
         end
       end
     end

@@ -3,18 +3,35 @@
 :toc-title: Versions
 :toclevels: 2
 
+== v0.2.2 — 2026-04-29
+
+=== Modifié
+
+* **Module interne renommé** `CrystalEmojis` → `Emojis` (convention
+  Aloli : retrait du préfixe `Crystal` sur les modules internes).
+* Dossier source `src/crystal_emojis/` → `src/emojis/` et fichier
+  d'entrée consolidé dans `src/emojis.cr` (le shim précédent est
+  supprimé). Les chemins `require` internes sont adaptés.
+* Comportement et surface CLI inchangés.
+
+=== Note pour les consommateurs
+
+Le code externe qui référençait `CrystalEmojis::*` (par ex.
+`crystal-asciidoctor-pdf`) doit être mis à jour vers `Emojis::*` et
+re-épinglé sur `~> 0.2.2`.
+
 == v0.2.1 — 2026-04-29
 
 === Modifié
 
-* **Repo GitHub renommé** `aloli-crystal/crystal-emojis` → `aloli-crystal/emojis`
+* **Repo GitHub renommé** `aloli-crystal/emojis` → `aloli-crystal/emojis`
   (convention de nommage Aloli : les créations originales abandonnent
   le préfixe `crystal-`). Les anciens liens redirigent automatiquement.
-* Champ `name:` du `shard.yml` mis à jour de `crystal-emojis` à `emojis`.
-* Cible de compilation et binaire CLI renommés `crystal-emojis` → `emojis`
+* Champ `name:` du `shard.yml` mis à jour de `emojis` à `emojis`.
+* Cible de compilation et binaire CLI renommés `emojis` → `emojis`
   (`shards build emojis` → `bin/emojis`).
 * Nouveau fichier d'entrée shim `src/emojis.cr` (charge
-  `src/crystal_emojis.cr`) ; `require "crystal-emojis"` devient
+  `src/crystal_emojis.cr`) ; `require "emojis"` devient
   `require "emojis"`.
 
 == v0.2.0 — 2026-04-26
