@@ -57,6 +57,33 @@ if positional.empty?
 end
 
 case positional.first
+when "help", "-h", "--help"
+  # UX standard `<cli> help [<sub>]` — cf. note mémoire ALOLI
+  # `feedback_cli_help_subcommand.md`. Sans argument c'est l'aide
+  # globale. Avec argument on filtre sur la sous-commande demandée
+  # pour pointer vite à la bonne section.
+  sub = positional[1]?
+  if sub.nil? || sub.empty?
+    puts parser
+    exit 0
+  end
+  valid_subs = %w(pull info purge)
+  unless valid_subs.includes?(sub.downcase)
+    STDERR.puts "Aide indisponible pour « #{sub} » (sous-commandes : #{valid_subs.join(", ")})."
+    STDERR.puts "Utilisez `emojis help` pour l'aide globale."
+    exit 1
+  end
+  full = parser.to_s
+  puts full
+  puts ""
+  puts "─── Focus : #{sub} ───"
+  full.lines.each_with_index do |line, i|
+    if line.includes?("  #{sub}  ") || line.lstrip.starts_with?("#{sub} ")
+      full.lines[i, 6].each { |l| puts l.rstrip }
+      break
+    end
+  end
+  exit 0
 when "pull"
   target = Emojis::Cache.dir(system: system_cache)
   puts "Téléchargement vers : #{target}"
