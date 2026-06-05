@@ -3,6 +3,17 @@
 :toc-title: Versions
 :toclevels: 2
 
+== v0.2.5 — 2026-06-05
+
+=== Changed
+
+* **`help <sub>` focus is now section-scoped.** The `help <sub>` filter
+  (added in v0.2.4) used to scan the whole USAGE banner and could land
+  on an earlier line where the sub name appears (usage line, an option's
+  description). It now starts matching only inside the
+  « Sous-commandes : » section, so `emojis help pull` reliably points at
+  the `pull` subcommand entry.
+
 == v0.2.2 — 2026-04-29
 
 === Changed
